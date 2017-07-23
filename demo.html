@@ -28,8 +28,13 @@
         </style>
     </head>
     <body>
+        <script>
+            var configure = function() {
+                console.log('configuring');
+            }
+        </script>
         <div class="container">
-            <monaco-editor value="alert();\nfdsgsgdfsfgdfsgdfsg\nfdsafasfsd"></monaco-editor>
+            <monaco-editor id="myeditor" configure="configure" value="alert();\nfdsgsgdfsfgdfsgdfsg\nfdsafasfsd"></monaco-editor>
         </div>
     </body>
 </html>

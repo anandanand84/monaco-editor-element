@@ -122,10 +122,21 @@ class MonacoEditor extends HTMLElement {
         this.root.appendChild(this.styleEl);
         this.root.appendChild(this.container);
         // Get the dependencies if needed
-        this._loadDependency().then(() => {
+        this._loadDependency().then(async () => {
             // Fill the style element with the stylesheet content
             this.styleEl.innerHTML = MonacoEditor._styleText;
             // Create the editor
+            let response = await fetch('https://raw.githubusercontent.com/anandanand84/technicalindicators/master/declarations/generated.d.ts', { method: 'get'})
+            let content = await response.text();
+            var technicalIndicators = content.replace(new RegExp('default ', 'g'), '').split('export').join('declare');
+            var disposable = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+            technicalIndicators
+            , 'indicators.d.ts');
+            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+                target: monaco.languages.typescript.ScriptTarget.ES5,
+                noEmit : true,
+                allowNonTsExtensions: true
+            });
             this.editor = monaco.editor.create(this.container, this.editorOptions);
             this.editor.viewModel._shadowRoot = this.root;
             this.bindEvents();
@@ -262,13 +273,25 @@ class MonacoEditor extends HTMLElement {
     get editorOptions () {
         return {
             namespace: this.namespace,
-            value: this.value,
             theme: this.theme,
-            language: this.language,
             readOnly: this.readOnly,
             lineNumbers: !this.noLineNumbers,
             roundedSelection: !this.noRoundedSelection,
-            scrollBeyondLastLine: !this.noScrollBeyondLastLine
+            scrollBeyondLastLine: !this.noScrollBeyondLastLine,
+            value: 
+`var mainput = input('ma1', InputType.Source, 'close');
+var fastPeriod = input('Fast Period', 'Number', 50);
+var slowPeriod = input('Slow Period', 'Number', 200);
+var sma50 = sma({period : fastPeriod , values: mainput});
+plot('sma50',sma50);
+var sma200 = sma({period : slowPeriod , values: mainput});
+plot('sma200',sma200);`,
+            fontSize : 12,
+            emptySelectionClipboard:false,
+            formatOnType : true,
+            formatOnPaste : true,
+            parameterHints : true,
+            language: 'typescript'
         }
     }
 
