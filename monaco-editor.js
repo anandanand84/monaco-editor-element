@@ -129,12 +129,31 @@ class MonacoEditor extends HTMLElement {
             let response = await fetch('https://raw.githubusercontent.com/anandanand84/technicalindicators/master/declarations/generated.d.ts', { method: 'get'})
             let content = await response.text();
             var technicalIndicators = content.replace(new RegExp('default ', 'g'), '').split('export').join('declare');
-            var disposable = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+            var disposableIndicators = monaco.languages.typescript.typescriptDefaults.addExtraLib(
             technicalIndicators
             , 'indicators.d.ts');
+            var disposableShapeFns = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+            `
+                declare function inputBoolean(name: string, defaultValue?: boolean): boolean;
+                declare function inputString(name: string, defaultValue?: string): string;
+                declare function inputLineWidth(name: string, defaultValue?: number): LineWidth;
+                declare function inputNumber(name: string, defaultValue?: number, options?: InputNumberOptions): number;
+                declare function inputColor(name: string, defaultValue?: string): string;
+                declare function inputPlotType(name: string, defaultValue?: AvailablePlotType): AvailablePlotType;
+                declare function inputOpacity(name: string, defaultValue?: number): number;
+                declare function inputList(name: string, defaultValue: string, choices?: string[]): string;
+                declare function inputSource(name: string, defaultValue: string): number[];
+                declare function plot(name: string, series: number[], styles?: PlotStyle, options?: DrawingOptions): any;
+                declare function fill(name: string, series1: number[], series2: number[], style?: FillStyle, options?: DrawingOptions): any;
+                declare function hline(name: string, location: number, styles?: PlotStyle, options?: DrawingOptions): any;
+                declare function hfill(name: string, number1: number, number2: number, style?: FillStyle, options?: DrawingOptions): any;
+            `
+            , 'shape.d.ts');
             monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
                 target: monaco.languages.typescript.ScriptTarget.ES5,
                 noEmit : true,
+                noLib : true,
+                lib : ['ES5'],
                 allowNonTsExtensions: true
             });
             this.editor = monaco.editor.create(this.container, this.editorOptions);
