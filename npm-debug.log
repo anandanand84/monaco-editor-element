@@ -1,0 +1,57 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/AAravindan/.nvm/versions/node/v7.6.0/bin/node',
+1 verbose cli   '/Users/AAravindan/.nvm/versions/node/v7.6.0/bin/npm',
+1 verbose cli   'version',
+1 verbose cli   'patch' ]
+2 info using npm@4.1.2
+3 info using node@v7.6.0
+4 info git [ 'status', '--porcelain' ]
+5 info lifecycle monaco-editor-element@0.0.10~preversion: monaco-editor-element@0.0.10
+6 silly lifecycle monaco-editor-element@0.0.10~preversion: no script for preversion, continuing
+7 verbose version.write data { name: 'monaco-editor-element',
+7 verbose version.write   version: '0.0.10',
+7 verbose version.write   description: 'A custom element wrapper for the Monaco editor by Microsoft',
+7 verbose version.write   main: 'monaco-editor.js',
+7 verbose version.write   dependencies: { 'monaco-editor': '^0.7.0' },
+7 verbose version.write   devDependencies:
+7 verbose version.write    { 'babel-cli': '^6.16.0',
+7 verbose version.write      'babel-preset-es2015': '^6.16.0',
+7 verbose version.write      'uglify-js': '^2.7.3' },
+7 verbose version.write   babel: { presets: [ 'es2015' ] },
+7 verbose version.write   scripts: { build: '', test: 'echo "Error: no test specified" && exit 1' },
+7 verbose version.write   repository:
+7 verbose version.write    { type: 'git',
+7 verbose version.write      url: 'git+https://github.com/paulvarache/monaco-editor-element.git' },
+7 verbose version.write   keywords: [ 'web-component', 'monaco' ],
+7 verbose version.write   author: 'platypusmeister <perso@paulvarache.ninja>',
+7 verbose version.write   license: 'ISC',
+7 verbose version.write   bugs: { url: 'https://github.com/paulvarache/monaco-editor-element/issues' },
+7 verbose version.write   homepage: 'https://github.com/paulvarache/monaco-editor-element#readme' } to package.json
+8 info lifecycle monaco-editor-element@0.0.10~version: monaco-editor-element@0.0.10
+9 silly lifecycle monaco-editor-element@0.0.10~version: no script for version, continuing
+10 info git [ 'add',
+10 info git   '/Users/AAravindan/dev/monaco-editor-element/package.json' ]
+11 info git [ 'commit', '-m', '0.0.10' ]
+12 info git [ 'tag', 'v0.0.10', '-am', '0.0.10' ]
+13 verbose stack Error: Command failed: git tag v0.0.10 -am 0.0.10
+13 verbose stack fatal: tag 'v0.0.10' already exists
+13 verbose stack
+13 verbose stack     at ChildProcess.exithandler (child_process.js:211:12)
+13 verbose stack     at emitTwo (events.js:106:13)
+13 verbose stack     at ChildProcess.emit (events.js:192:7)
+13 verbose stack     at maybeClose (internal/child_process.js:890:16)
+13 verbose stack     at Socket.<anonymous> (internal/child_process.js:334:11)
+13 verbose stack     at emitOne (events.js:96:13)
+13 verbose stack     at Socket.emit (events.js:189:7)
+13 verbose stack     at Pipe._handle.close [as _onclose] (net.js:501:12)
+14 verbose cwd /Users/AAravindan/dev/monaco-editor-element
+15 error Darwin 16.6.0
+16 error argv "/Users/AAravindan/.nvm/versions/node/v7.6.0/bin/node" "/Users/AAravindan/.nvm/versions/node/v7.6.0/bin/npm" "version" "patch"
+17 error node v7.6.0
+18 error npm  v4.1.2
+19 error code 128
+20 error Command failed: git tag v0.0.10 -am 0.0.10
+20 error fatal: tag 'v0.0.10' already exists
+21 error If you need help, you may report this error at:
+21 error     <https://github.com/npm/npm/issues>
+22 verbose exit [ 1, true ]

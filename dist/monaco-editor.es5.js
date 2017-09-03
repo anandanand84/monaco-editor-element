@@ -151,7 +151,7 @@ var MonacoEditor = function (_HTMLElement) {
                 // Create the editor
                 var fetchPromise = fetch('https://raw.githubusercontent.com/anandanand84/technicalindicators/master/declarations/generated.d.ts', { method: 'get' });
 
-                response.then(function (response) {
+                fetchPromise.then(function (response) {
                     return response.text();
                 }).then(function (content) {
                     var technicalIndicators = content.replace(new RegExp('default ', 'g'), '').split('export').join('declare');
