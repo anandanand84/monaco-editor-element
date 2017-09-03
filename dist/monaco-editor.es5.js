@@ -132,8 +132,6 @@ var MonacoEditor = function (_HTMLElement) {
     }, {
         key: 'connectedCallback',
         value: function connectedCallback() {
-            var _this2 = this;
-
             this._loading = true;
             // Create a shadow root to host the style and the editor's container'
             this.root = typeof this.attachShadow === 'function' ? this.attachShadow({ mode: 'open' }) : this.createShadowRoot();
@@ -146,26 +144,43 @@ var MonacoEditor = function (_HTMLElement) {
             this.root.appendChild(this.styleEl);
             this.root.appendChild(this.container);
             // Get the dependencies if needed
+            var self = this;
             this._loadDependency().then(function () {
                 // Fill the style element with the stylesheet content
-                _this2.styleEl.innerHTML = MonacoEditor._styleText;
+                self.styleEl.innerHTML = MonacoEditor._styleText;
                 // Create the editor
-                _this2.editor = monaco.editor.create(_this2.container, _this2.editorOptions);
-                _this2.editor.viewModel._shadowRoot = _this2.root;
-                _this2.bindEvents();
-                _this2._loading = false;
-                // Notify that the editor is ready
-                _this2.dispatchEvent(new CustomEvent('ready', { bubbles: true }));
+                var fetchPromise = fetch('https://raw.githubusercontent.com/anandanand84/technicalindicators/master/declarations/generated.d.ts', { method: 'get' });
+
+                response.then(function (response) {
+                    return response.text();
+                }).then(function (content) {
+                    var technicalIndicators = content.replace(new RegExp('default ', 'g'), '').split('export').join('declare');
+                    var disposableIndicators = monaco.languages.typescript.typescriptDefaults.addExtraLib(technicalIndicators, 'indicators.d.ts');
+                    var disposableShapeFns = monaco.languages.typescript.typescriptDefaults.addExtraLib('\n                    declare function inputBoolean(name: string, defaultValue?: boolean): boolean;\n                    declare function inputString(name: string, defaultValue?: string): string;\n                    declare function inputLineWidth(name: string, defaultValue?: number): LineWidth;\n                    declare function inputNumber(name: string, defaultValue?: number, options?: InputNumberOptions): number;\n                    declare function inputColor(name: string, defaultValue?: string): string;\n                    declare function inputPlotType(name: string, defaultValue?: AvailablePlotType): AvailablePlotType;\n                    declare function inputOpacity(name: string, defaultValue?: number): number;\n                    declare function inputList(name: string, defaultValue: string, choices?: string[]): string;\n                    declare function inputSource(name: string, defaultValue: string): number[];\n                    declare function plot(name: string, series: number[], styles?: PlotStyle, options?: DrawingOptions): any;\n                    declare function fill(name: string, series1: number[], series2: number[], style?: FillStyle, options?: DrawingOptions): any;\n                    declare function hline(name: string, location: number, styles?: PlotStyle, options?: DrawingOptions): any;\n                    declare function hfill(name: string, number1: number, number2: number, style?: FillStyle, options?: DrawingOptions): any;\n                ', 'shape.d.ts');
+                    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+                        target: monaco.languages.typescript.ScriptTarget.ES5,
+                        noEmit: true,
+                        noLib: true,
+                        lib: ['ES5'],
+                        allowNonTsExtensions: true
+                    });
+                    self.editor = monaco.editor.create(self.container, self.editorOptions);
+                    self.editor.viewModel._shadowRoot = self.root;
+                    self.bindEvents();
+                    self._loading = false;
+                    // Notify that the editor is ready
+                    self.dispatchEvent(new CustomEvent('ready', { bubbles: true }));
+                });
             });
         }
     }, {
         key: 'bindEvents',
         value: function bindEvents() {
-            var _this3 = this;
+            var _this2 = this;
 
             this.editor.onDidChangeModelContent(function (event) {
-                _this3.value = _this3.editor.getValue();
-                _this3.dispatchEvent(new CustomEvent('changed', { bubbles: true }));
+                _this2.value = _this2.editor.getValue();
+                _this2.dispatchEvent(new CustomEvent('changed', { bubbles: true }));
             });
         }
 
@@ -189,10 +204,10 @@ var MonacoEditor = function (_HTMLElement) {
     }, {
         key: '_loadMonaco',
         value: function _loadMonaco() {
-            var _this4 = this;
+            var _this3 = this;
 
             return new Promise(function (resolve, reject) {
-                require.config({ paths: { 'vs': _this4.editorOptions.namespace } });
+                require.config({ paths: { 'vs': _this3.editorOptions.namespace } });
                 require(['vs/editor/editor.main'], resolve);
             });
         }
@@ -228,7 +243,7 @@ var MonacoEditor = function (_HTMLElement) {
     }, {
         key: 'addStringProperty',
         value: function addStringProperty(name, monacoName, value, reflectToAttribute) {
-            var _this5 = this;
+            var _this4 = this;
 
             var cachedName = '_' + name,
                 attrName = name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(),
@@ -236,19 +251,19 @@ var MonacoEditor = function (_HTMLElement) {
             this[cachedName] = value;
             Object.defineProperty(this, name, {
                 get: function get() {
-                    return _this5[cachedName];
+                    return _this4[cachedName];
                 },
                 set: function set(value) {
-                    if (_this5[cachedName] === value) {
+                    if (_this4[cachedName] === value) {
                         return;
                     }
-                    _this5[cachedName] = value;
+                    _this4[cachedName] = value;
                     if (reflectToAttribute) {
-                        _this5.setAttribute(attrName, _this5[cachedName]);
+                        _this4.setAttribute(attrName, _this4[cachedName]);
                     }
-                    if (_this5.editor) {
-                        monacoOptions[monacoName] = _this5[cachedName];
-                        _this5.editor.updateOptions(monacoOptions);
+                    if (_this4.editor) {
+                        monacoOptions[monacoName] = _this4[cachedName];
+                        _this4.editor.updateOptions(monacoOptions);
                     }
                 }
             });
@@ -256,7 +271,7 @@ var MonacoEditor = function (_HTMLElement) {
     }, {
         key: 'addBooleanProperty',
         value: function addBooleanProperty(name, monacoName, value, reflectToAttribute, invert) {
-            var _this6 = this;
+            var _this5 = this;
 
             var cachedName = '_' + name,
                 attrName = name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(),
@@ -265,24 +280,24 @@ var MonacoEditor = function (_HTMLElement) {
             this[cachedName] = value;
             Object.defineProperty(this, name, {
                 get: function get() {
-                    return _this6[cachedName];
+                    return _this5[cachedName];
                 },
                 set: function set(value) {
                     value = value == '' ? true : Boolean(value);
-                    if (_this6[cachedName] === value) {
+                    if (_this5[cachedName] === value) {
                         return;
                     }
-                    _this6[cachedName] = value;
+                    _this5[cachedName] = value;
                     if (reflectToAttribute) {
                         if (value) {
-                            _this6.setAttribute(attrName, '');
+                            _this5.setAttribute(attrName, '');
                         } else {
-                            _this6.removeAttribute(attrName);
+                            _this5.removeAttribute(attrName);
                         }
                     }
-                    if (_this6.editor) {
-                        monacoOptions[monacoName] = invert ? !_this6[cachedName] : _this6[cachedName];
-                        _this6.editor.updateOptions(monacoOptions);
+                    if (_this5.editor) {
+                        monacoOptions[monacoName] = invert ? !_this5[cachedName] : _this5[cachedName];
+                        _this5.editor.updateOptions(monacoOptions);
                     }
                 }
             });
@@ -311,13 +326,18 @@ var MonacoEditor = function (_HTMLElement) {
         get: function get() {
             return {
                 namespace: this.namespace,
-                value: this.value,
                 theme: this.theme,
-                language: this.language,
                 readOnly: this.readOnly,
                 lineNumbers: !this.noLineNumbers,
                 roundedSelection: !this.noRoundedSelection,
-                scrollBeyondLastLine: !this.noScrollBeyondLastLine
+                scrollBeyondLastLine: !this.noScrollBeyondLastLine,
+                value: 'var mainput = input(\'ma1\', InputType.Source, \'close\');\nvar fastPeriod = input(\'Fast Period\', \'Number\', 50);\nvar slowPeriod = input(\'Slow Period\', \'Number\', 200);\nvar sma50 = sma({period : fastPeriod , values: mainput});\nplot(\'sma50\',sma50);\nvar sma200 = sma({period : slowPeriod , values: mainput});\nplot(\'sma200\',sma200);',
+                fontSize: 12,
+                emptySelectionClipboard: false,
+                formatOnType: true,
+                formatOnPaste: true,
+                parameterHints: true,
+                language: 'typescript'
             };
         }
     }, {

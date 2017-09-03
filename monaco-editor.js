@@ -122,46 +122,52 @@ class MonacoEditor extends HTMLElement {
         this.root.appendChild(this.styleEl);
         this.root.appendChild(this.container);
         // Get the dependencies if needed
-        this._loadDependency().then(async () => {
+        var self = this;
+        this._loadDependency().then(function (){
             // Fill the style element with the stylesheet content
-            this.styleEl.innerHTML = MonacoEditor._styleText;
+            self.styleEl.innerHTML = MonacoEditor._styleText;
             // Create the editor
-            let response = await fetch('https://raw.githubusercontent.com/anandanand84/technicalindicators/master/declarations/generated.d.ts', { method: 'get'})
-            let content = await response.text();
-            var technicalIndicators = content.replace(new RegExp('default ', 'g'), '').split('export').join('declare');
-            var disposableIndicators = monaco.languages.typescript.typescriptDefaults.addExtraLib(
-            technicalIndicators
-            , 'indicators.d.ts');
-            var disposableShapeFns = monaco.languages.typescript.typescriptDefaults.addExtraLib(
-            `
-                declare function inputBoolean(name: string, defaultValue?: boolean): boolean;
-                declare function inputString(name: string, defaultValue?: string): string;
-                declare function inputLineWidth(name: string, defaultValue?: number): LineWidth;
-                declare function inputNumber(name: string, defaultValue?: number, options?: InputNumberOptions): number;
-                declare function inputColor(name: string, defaultValue?: string): string;
-                declare function inputPlotType(name: string, defaultValue?: AvailablePlotType): AvailablePlotType;
-                declare function inputOpacity(name: string, defaultValue?: number): number;
-                declare function inputList(name: string, defaultValue: string, choices?: string[]): string;
-                declare function inputSource(name: string, defaultValue: string): number[];
-                declare function plot(name: string, series: number[], styles?: PlotStyle, options?: DrawingOptions): any;
-                declare function fill(name: string, series1: number[], series2: number[], style?: FillStyle, options?: DrawingOptions): any;
-                declare function hline(name: string, location: number, styles?: PlotStyle, options?: DrawingOptions): any;
-                declare function hfill(name: string, number1: number, number2: number, style?: FillStyle, options?: DrawingOptions): any;
-            `
-            , 'shape.d.ts');
-            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-                target: monaco.languages.typescript.ScriptTarget.ES5,
-                noEmit : true,
-                noLib : true,
-                lib : ['ES5'],
-                allowNonTsExtensions: true
-            });
-            this.editor = monaco.editor.create(this.container, this.editorOptions);
-            this.editor.viewModel._shadowRoot = this.root;
-            this.bindEvents();
-            this._loading = false;
-            // Notify that the editor is ready
-            this.dispatchEvent(new CustomEvent('ready', { bubbles: true }));
+            let fetchPromise = fetch('https://raw.githubusercontent.com/anandanand84/technicalindicators/master/declarations/generated.d.ts', { method: 'get'})
+            
+            response.then(function(response) {
+                return response.text();
+            })
+            .then(function(content) {
+                var technicalIndicators = content.replace(new RegExp('default ', 'g'), '').split('export').join('declare');
+                var disposableIndicators = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+                technicalIndicators
+                , 'indicators.d.ts');
+                var disposableShapeFns = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+                `
+                    declare function inputBoolean(name: string, defaultValue?: boolean): boolean;
+                    declare function inputString(name: string, defaultValue?: string): string;
+                    declare function inputLineWidth(name: string, defaultValue?: number): LineWidth;
+                    declare function inputNumber(name: string, defaultValue?: number, options?: InputNumberOptions): number;
+                    declare function inputColor(name: string, defaultValue?: string): string;
+                    declare function inputPlotType(name: string, defaultValue?: AvailablePlotType): AvailablePlotType;
+                    declare function inputOpacity(name: string, defaultValue?: number): number;
+                    declare function inputList(name: string, defaultValue: string, choices?: string[]): string;
+                    declare function inputSource(name: string, defaultValue: string): number[];
+                    declare function plot(name: string, series: number[], styles?: PlotStyle, options?: DrawingOptions): any;
+                    declare function fill(name: string, series1: number[], series2: number[], style?: FillStyle, options?: DrawingOptions): any;
+                    declare function hline(name: string, location: number, styles?: PlotStyle, options?: DrawingOptions): any;
+                    declare function hfill(name: string, number1: number, number2: number, style?: FillStyle, options?: DrawingOptions): any;
+                `
+                , 'shape.d.ts');
+                monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+                    target: monaco.languages.typescript.ScriptTarget.ES5,
+                    noEmit : true,
+                    noLib : true,
+                    lib : ['ES5'],
+                    allowNonTsExtensions: true
+                });
+                self.editor = monaco.editor.create(self.container, self.editorOptions);
+                self.editor.viewModel._shadowRoot = self.root;
+                self.bindEvents();
+                self._loading = false;
+                // Notify that the editor is ready
+                self.dispatchEvent(new CustomEvent('ready', { bubbles: true }));
+            })
         });
     }
 
