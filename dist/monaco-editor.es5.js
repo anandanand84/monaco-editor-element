@@ -169,7 +169,11 @@ var MonacoEditor = function (_HTMLElement) {
                     self.bindEvents();
                     self._loading = false;
                     // Notify that the editor is ready
-                    self.dispatchEvent(new CustomEvent('ready', { bubbles: true }));
+                    self.dispatchEvent(new CustomEvent('ready', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {}
+                    }));
                 });
             });
         }
@@ -180,7 +184,7 @@ var MonacoEditor = function (_HTMLElement) {
 
             this.editor.onDidChangeModelContent(function (event) {
                 _this2.value = _this2.editor.getValue();
-                _this2.dispatchEvent(new CustomEvent('changed', { bubbles: true }));
+                _this2.dispatchEvent(new CustomEvent('changed', { composed: true, bubbles: true }));
             });
         }
 
@@ -331,10 +335,10 @@ var MonacoEditor = function (_HTMLElement) {
                 lineNumbers: !this.noLineNumbers,
                 roundedSelection: !this.noRoundedSelection,
                 scrollBeyondLastLine: !this.noScrollBeyondLastLine,
-                value: 'var mainput = input(\'ma1\', InputType.Source, \'close\');\nvar fastPeriod = input(\'Fast Period\', \'Number\', 50);\nvar slowPeriod = input(\'Slow Period\', \'Number\', 200);\nvar sma50 = sma({period : fastPeriod , values: mainput});\nplot(\'sma50\',sma50);\nvar sma200 = sma({period : slowPeriod , values: mainput});\nplot(\'sma200\',sma200);',
+                value: '\n//Editor executes on every trade\n//Sample indicator\nlet { high, low, close } = this.data;\nlet period = inputNumber(\'Period\', 14);\nlet strokeColor = inputColor(\'Color\', \'#64B5F6\')\nlet atrValues = atr({ high, low, close, period})\nplot(\'ATR\', atrValues, { strokeColor });\n\n// Managing state between runs, \n// To store state that persist between different runs of the indicator you should use state like below.\n//This state is shared by all charts and all indicators, create namespaces like line two for your specific instruments or charts or indicators\nlet state = this.state;\nstate[this.metadata.instrument] = {} //Store for this instrument\n    \n\n//Sample Trading from editor using placeOrder, cancelOrder, \nconsole.log(this.metadata);\nlet status = await placeOrder(this.metadata.exchange, {\n    "exchange":this.metadata.exchange,\n    "symbol": this.metadata.instrument,\n    "transactionType": "SELL",\n    "quantity":2,\n    "orderType":"LIMIT",\n    "validity":"GTC",\n    "postOnly":true,\n    "hiddenOrder":false,\n    "price":600.84\n})\nif(status) {\n    console.log(\'Order placed\');\n} else {\n    console.log(\'Order Failed\');\n}\nawait updateOrder(this.metadata.exchange); //Update the order line in chart;\n\n//For more advanced editor operation glance available indicators in edit mode.\n',
                 fontSize: 12,
                 emptySelectionClipboard: false,
-                formatOnType: true,
+                formatOnType: false,
                 formatOnPaste: true,
                 parameterHints: true,
                 language: 'typescript'
