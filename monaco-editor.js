@@ -126,54 +126,24 @@ class MonacoEditor extends HTMLElement {
         this._loadDependency().then(function (){
             // Fill the style element with the stylesheet content
             self.styleEl.innerHTML = MonacoEditor._styleText;
-            // Create the editor
-            let fetchPromise = fetch('https://raw.githubusercontent.com/anandanand84/technicalindicators/master/declarations/generated.d.ts', { method: 'get'})
-            
-            fetchPromise.then(function(response) {
-                return response.text();
-            })
-            .then(function(content) {
-                var technicalIndicators = content.replace(new RegExp('default ', 'g'), '').split('export').join('declare');
-                var disposableIndicators = monaco.languages.typescript.typescriptDefaults.addExtraLib(
-                technicalIndicators
-                , 'indicators.d.ts');
-                var disposableShapeFns = monaco.languages.typescript.typescriptDefaults.addExtraLib(
-                `
-                    declare function inputBoolean(name: string, defaultValue?: boolean): boolean;
-                    declare function inputString(name: string, defaultValue?: string): string;
-                    declare function inputLineWidth(name: string, defaultValue?: number): LineWidth;
-                    declare function inputNumber(name: string, defaultValue?: number, options?: InputNumberOptions): number;
-                    declare function inputColor(name: string, defaultValue?: string): string;
-                    declare function inputPlotType(name: string, defaultValue?: AvailablePlotType): AvailablePlotType;
-                    declare function inputOpacity(name: string, defaultValue?: number): number;
-                    declare function inputList(name: string, defaultValue: string, choices?: string[]): string;
-                    declare function inputSource(name: string, defaultValue: string): number[];
-                    declare function plot(name: string, series: number[], styles?: PlotStyle, options?: DrawingOptions): any;
-                    declare function fill(name: string, series1: number[], series2: number[], style?: FillStyle, options?: DrawingOptions): any;
-                    declare function hline(name: string, location: number, styles?: PlotStyle, options?: DrawingOptions): any;
-                    declare function hfill(name: string, number1: number, number2: number, style?: FillStyle, options?: DrawingOptions): any;
-                `
-                , 'shape.d.ts');
-                monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-                    target: monaco.languages.typescript.ScriptTarget.ES5,
-                    noEmit : true,
-                    noLib : true,
-                    lib : ['ES5'],
-                    allowNonTsExtensions: true
-                });
-                self.editor = monaco.editor.create(self.container, self.editorOptions);
-                self.editor.viewModel._shadowRoot = self.root;
-                self.bindEvents();
-                self._loading = false;
-                // Notify that the editor is ready
-                self.dispatchEvent(new CustomEvent('ready', {
-                    bubbles: true,
-                    composed: true,
-                    detail: {
-                        
-                    }
-                }));
-            })
+            self.editor = monaco.editor.create(self.container, self.editorOptions);
+            self.editor.viewModel._shadowRoot = self.root;
+            self.bindEvents();
+            self._loading = false;
+            self.dispatchEvent(new CustomEvent('ready', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    
+                }
+            }));
+            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+                target: monaco.languages.typescript.ScriptTarget.ES5,
+                noEmit : true,
+                noLib : true,
+                lib : ['ES5'],
+                allowNonTsExtensions: true
+            });
         });
     }
 
@@ -309,48 +279,11 @@ class MonacoEditor extends HTMLElement {
             lineNumbers: !this.noLineNumbers,
             roundedSelection: !this.noRoundedSelection,
             scrollBeyondLastLine: !this.noScrollBeyondLastLine,
-            value:`
-//Editor executes on every trade
-//Sample indicator
-let { high, low, close } = this.data;
-let period = inputNumber('Period', 14);
-let strokeColor = inputColor('Color', '#64B5F6')
-let atrValues = atr({ high, low, close, period})
-plot('ATR', atrValues, { strokeColor });
-
-// Managing state between runs, 
-// To store state that persist between different runs of the indicator you should use state like below.
-//This state is shared by all charts and all indicators, create namespaces like line two for your specific instruments or charts or indicators
-let state = this.state;
-state[this.metadata.instrument] = {} //Store for this instrument
-    
-
-//Sample Trading from editor using placeOrder, cancelOrder, 
-console.log(this.metadata);
-let status = await placeOrder(this.metadata.exchange, {
-    "exchange":this.metadata.exchange,
-    "symbol": this.metadata.instrument,
-    "transactionType": "SELL",
-    "quantity":2,
-    "orderType":"LIMIT",
-    "validity":"GTC",
-    "postOnly":true,
-    "hiddenOrder":false,
-    "price":600.84
-})
-if(status) {
-    console.log('Order placed');
-} else {
-    console.log('Order Failed');
-}
-await updateOrder(this.metadata.exchange); //Update the order line in chart;
-
-//For more advanced editor operation glance available indicators in edit mode.
-`,
+            value: '',
             fontSize : 12,
             emptySelectionClipboard:false,
             formatOnType : false,
-            formatOnPaste : true,
+            formatOnPaste : false,
             parameterHints : true,
             language: 'typescript'
         }
